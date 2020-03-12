@@ -29,15 +29,22 @@ typedef enum enMbErrCode{
 
 typedef enum enCallType
 {
-    POSTPONE = 0,
-    INSTANTLY,
+    POSTPONE = 0,   //延后执行
+    INSTANTLY,      //立即执行
+};
+
+typedef enum enRwCall
+{
+    ReadCall = 0,   //读取时候调用
+    WriteCall,      //写入时候调用
 };
 
 typedef struct Reg{
     u16 RegAddr;
     u16 Red:1;
     u16 Write:1;
-    u16 CallType:2;
+    u16 CallType:1;
+    u16 RWCall:1;
     void *CallBackFun;
 }Reg;
 
@@ -52,5 +59,12 @@ typedef struct MBSlave{
 
 
 
+/********************* 对外接口 **************************/
+void ComDataProcess(const int com, u8 *Data, int DataLen);   //连接串口
+
+int MBSlave_Create(MBSlave *Slave, int com, int *DriverId);  //创建从机
+
+int WriteMBRegData(int DriverId, u16 addr, enum DataType type, u8 *data, int lens);  //模块使用
+int ReadMBRegData(int DriverId, u16 addr, enum DataType type, u8 *data int lens);    //模块使用
 
 #endif
