@@ -201,7 +201,7 @@ int WriteMBRegData(int DriverId, u16 addr, enum DataType type, u8 *data, int len
  *          point   起始位置（位）
  *          num     长度（位数）
 *******************************************************************/
-void My_BitCpy(u8 *dst, u8 *src, int point, int num)
+void My_BitCpy(u8 *dst, int Dpoint u8 *src, int Spoint, int num)
 {
     int i = 0;
     if((NULL == dst) || (NULL == src))
@@ -211,11 +211,11 @@ void My_BitCpy(u8 *dst, u8 *src, int point, int num)
 
     My_memset(dst, 0, (num-1)/8+1);
 
-    for(i=0; i<num; i++)
+    for(i=Dpoint; i< num + Dpoint; i++)
     {
         if((*(src + point/8)) & ((0x01 << (point % 8)) ))
         {
-            (*dst + i/8) |= (0x01 << (i % 8)) 
+            (*(dst + i/8)) |= (0x01 << (i % 8));
         }
         point++;
     }
@@ -243,8 +243,9 @@ void DriverProcess(int DriverId, u8 *RcvData, int RDataLen, u8 *SendData, int *S
     {
         case 0x01:
         case 0x02:{ //读bit
-            SendData[2] = SLens = (((u16)RcvData[4]<<8 + (u16)RcvData[5])-1)/8 + 1;
-            My_memcpy(SendData[3], MBSlaveList[DriverId].BitMap[(Regaddr-1)/8], SLens);     //这里有问题
+            SLens = (u16)RcvData[4]<<8 + (u16)RcvData[5]
+            SendData[2] = (SLens - 1)/8 + 1;
+            My_BitCpy(&SendData[3], 0, MBSlaveList[DriverId].BitMap, Regaddr, SLens);     //这里有问题
             //加入地址安全代码
             break;
         }
